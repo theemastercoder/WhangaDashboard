@@ -3,38 +3,137 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Whangamatā Surf Dashboard</title>
-<link rel="stylesheet" href="styles.css">
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<title>Whangamatā Surf & Weather Dashboard</title>
+<link href="https://cdn.jsdelivr.net/npm/chart.js" rel="stylesheet">
+<style>
+  body {
+    font-family: 'Arial', sans-serif;
+    margin:0;
+    padding:0;
+    background: #f0f4f8;
+    color: #333;
+  }
+  header {
+    background: #1e3a8a;
+    color: white;
+    padding: 20px;
+    text-align: center;
+  }
+  header h1 {
+    margin: 0;
+    font-size: 2em;
+  }
+  .summary {
+    display: flex;
+    justify-content: space-around;
+    padding: 20px;
+    background: #3b82f6;
+    color: white;
+  }
+  .summary div {
+    text-align: center;
+  }
+  .container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    padding: 20px;
+  }
+  .chart-card, .cam-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    padding: 20px;
+    margin: 10px;
+    flex: 1 1 400px;
+  }
+  .chart-card h3, .cam-card h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #1e3a8a;
+  }
+  canvas {
+    max-width: 100%;
+  }
+  iframe {
+    width: 100%;
+    height: 300px;
+    border: none;
+    border-radius: 8px;
+  }
+  .cam-buttons {
+    text-align: center;
+    margin: 10px 0;
+  }
+  .cam-buttons button {
+    margin: 0 5px;
+    padding: 5px 10px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    background: #3b82f6;
+    color: white;
+    font-weight: bold;
+  }
+  .cam-buttons button.active {
+    background: #1e3a8a;
+  }
+</style>
 </head>
 <body>
-  <header>
-    <h1>Whangamatā Surf Dashboard</h1>
-  </header>
 
-  <section id="summary">
-    <div>Avg Wind: <span id="avgWind">--</span></div>
-    <div>Avg Swell: <span id="avgSwell">--</span></div>
-    <div id="mapOverlay">Wind dir (avg): --°</div>
-    <div id="sunset">Sunset: --</div>
-  </section>
+<header>
+  <h1>Whangamatā Surf & Weather Dashboard</h1>
+</header>
 
-  <section id="charts">
-    <canvas id="uvChart"></canvas>
+<div class="summary">
+  <div>
+    <h3>Avg Wind</h3>
+    <p id="avgWind">--</p>
+  </div>
+  <div>
+    <h3>Total Rain</h3>
+    <p id="totalRain">--</p>
+  </div>
+  <div>
+    <h3>Avg UV Index</h3>
+    <p id="avgUV">--</p>
+  </div>
+  <div>
+    <h3>Avg Wave Height</h3>
+    <p id="avgWave">--</p>
+  </div>
+</div>
+
+<div class="container">
+  <div class="chart-card">
+    <h3>Wind Speed (m/s)</h3>
     <canvas id="windChart"></canvas>
+  </div>
+  <div class="chart-card">
+    <h3>Precipitation (mm)</h3>
     <canvas id="rainChart"></canvas>
-    <canvas id="swellChart"></canvas>
-    <canvas id="tideChart"></canvas>
-  </section>
+  </div>
+  <div class="chart-card">
+    <h3>UV Index</h3>
+    <canvas id="uvChart"></canvas>
+  </div>
+  <div class="chart-card">
+    <h3>Wave Height (m)</h3>
+    <canvas id="waveChart"></canvas>
+  </div>
 
-  <section id="cams">
+  <div class="cam-card">
+    <h3>Live Cameras</h3>
+    <iframe id="camFrame" src=""></iframe>
     <div class="cam-buttons">
       <button id="camBtn2">Cam 1</button>
       <button id="camBtn3">Cam 2</button>
     </div>
-    <iframe id="camFrame" src="" frameborder="0" allowfullscreen></iframe>
-  </section>
+  </div>
+</div>
 
-  <script src="app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="dashboard.js"></script>
 </body>
 </html>
