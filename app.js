@@ -4,7 +4,7 @@
 
 const LAT = -37.209;
 const LON = 175.873;
-const STORMGLASS_KEY = "<YOUR_API_KEY>"; // replace with your key
+const STORMGLASS_KEY = "0bf997b2-d660-11f0-a8f4-0242ac130003-0bf9988e-d660-11f0-a8f4-0242ac130003"; // replace with your key
 
 // cams
 const CAMS = [
