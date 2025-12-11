@@ -9,7 +9,7 @@
 </head>
 <body>
 <div class="wrap">
-  <h1>Whangamata Surf Dashboard — Light Mode</h1>
+  <h1>Whangamata Surf Dashboard</h1>
   <div class="grid">
     <div class="left">
       <!-- CAM Card -->
@@ -19,8 +19,9 @@
           <button id="camBtn3">Cam 3</button>
           <button id="camBtn4">Cam 4</button>
         </div>
-        <iframe id="camFrame" class="cam" src="https://corolive.nz/whangamata" frameborder="0" allowfullscreen></iframe>
-        <div class="footer">Click cams to switch</div>
+        <div class="cam-container">
+          <iframe id="camFrame" src="https://corolive.nz/whangamata" frameborder="0" allowfullscreen></iframe>
+        </div>
       </div>
 
       <!-- UV Chart -->
@@ -29,7 +30,7 @@
         <canvas id="uvChart" height="120"></canvas>
       </div>
 
-      <!-- Row of other charts -->
+      <!-- Other charts -->
       <div class="row">
         <div class="card">
           <h3>Wind (hourly)</h3>
@@ -40,7 +41,7 @@
           <canvas id="rainChart" height="140"></canvas>
         </div>
         <div class="card">
-          <h3>Swell height</h3>
+          <h3>Swell height (m)</h3>
           <canvas id="swellChart" height="140"></canvas>
         </div>
       </div>
@@ -62,7 +63,7 @@
       <canvas id="tideChart" height="160"></canvas>
       <hr>
       <h3>Wind overlay (map)</h3>
-      <div id="mapOverlay" class="map-placeholder">Map + wind overlay will show here</div>
+      <div id="mapOverlay" class="map-placeholder">Wind direction: avg --°</div>
     </div>
   </div>
 </div>
@@ -70,4 +71,3 @@
 <script src="app.js"></script>
 </body>
 </html>
-
