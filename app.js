@@ -4,7 +4,7 @@
 
 const LAT = -37.209;
 const LON = 175.873;
-const STORMGLASS_KEY = "0bf997b2-d660-11f0-a8f4-0242ac130003-0bf9988e-d660-11f0-a8f4-0242ac130003"; // replace with your key
+const STORMGLASS_KEY = "<YOUR_API_KEY>"; // replace with your key
 
 // cams
 const CAMS = [
@@ -55,7 +55,18 @@ const tideChart = new Chart(el('tideChart').getContext('2d'), {type:'line', data
 // ---------------------------
 // fetch Stormglass
 async function fetchStormglass(){
-  const params = ['airTemperature','precipitation','windSpeed','windDirection','waveHeight','waveDirection','swellHeight','swellDirection','uvIndex','tideHeight'].join(',');
+  const params = [
+    'airTemperature',
+    'precipitation',
+    'windSpeed',
+    'windDirection',
+    'waveHeight',
+    'waveDirection',
+    'swellHeight',
+    'swellDirection',
+    'uvIndex'
+  ].join(',');
+  
   const url = `https://api.stormglass.io/v2/weather/point?lat=${LAT}&lng=${LON}&params=${params}`;
 
   try{
@@ -68,28 +79,28 @@ async function fetchStormglass(){
     const times = data.hours.map(h=>new Date(h.time).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}));
 
     // UV
-    uvChart.data.labels=times;
-    uvChart.data.datasets[0].data=extract('uvIndex');
+    uvChart.data.labels = times;
+    uvChart.data.datasets[0].data = extract('uvIndex');
     uvChart.update();
 
     // Wind
-    windChart.data.labels=times;
-    windChart.data.datasets[0].data=extract('windSpeed');
+    windChart.data.labels = times;
+    windChart.data.datasets[0].data = extract('windSpeed');
     windChart.update();
 
     // Rain
-    rainChart.data.labels=times;
-    rainChart.data.datasets[0].data=extract('precipitation');
+    rainChart.data.labels = times;
+    rainChart.data.datasets[0].data = extract('precipitation');
     rainChart.update();
 
     // Swell / Wave
-    swellChart.data.labels=times;
-    swellChart.data.datasets[0].data=extract('waveHeight');
+    swellChart.data.labels = times;
+    swellChart.data.datasets[0].data = extract('waveHeight');
     swellChart.update();
 
-    // Tide
-    tideChart.data.labels=times;
-    tideChart.data.datasets[0].data=extract('tideHeight');
+    // Tide chart placeholder (no tide in Stormglass)
+    tideChart.data.labels = times;
+    tideChart.data.datasets[0].data = Array(times.length).fill(null);
     tideChart.update();
 
     // summary averages
