@@ -2,72 +2,39 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Whangamata Surf Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Whangamatā Surf Dashboard</title>
 <link rel="stylesheet" href="styles.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-<div class="wrap">
-  <h1>Whangamata Surf Dashboard</h1>
-  <div class="grid">
-    <div class="left">
-      <!-- CAM Card -->
-      <div class="card" id="camCard">
-        <div class="cam-switch">
-          <button id="camBtn2" class="active">Cam 2</button>
-          <button id="camBtn3">Cam 3</button>
-          <button id="camBtn4">Cam 4</button>
-        </div>
-        <div class="cam-container">
-          <iframe id="camFrame" src="https://corolive.nz/whangamata" frameborder="0" allowfullscreen></iframe>
-        </div>
-      </div>
+  <header>
+    <h1>Whangamatā Surf Dashboard</h1>
+  </header>
 
-      <!-- UV Chart -->
-      <div class="card">
-        <h2>UV index (today)</h2>
-        <canvas id="uvChart" height="120"></canvas>
-      </div>
+  <section id="summary">
+    <div>Avg Wind: <span id="avgWind">--</span></div>
+    <div>Avg Swell: <span id="avgSwell">--</span></div>
+    <div id="mapOverlay">Wind dir (avg): --°</div>
+    <div id="sunset">Sunset: --</div>
+  </section>
 
-      <!-- Other charts -->
-      <div class="row">
-        <div class="card">
-          <h3>Wind (hourly)</h3>
-          <canvas id="windChart" height="140"></canvas>
-        </div>
-        <div class="card">
-          <h3>Rain (hourly)</h3>
-          <canvas id="rainChart" height="140"></canvas>
-        </div>
-        <div class="card">
-          <h3>Swell height (m)</h3>
-          <canvas id="swellChart" height="140"></canvas>
-        </div>
-      </div>
+  <section id="charts">
+    <canvas id="uvChart"></canvas>
+    <canvas id="windChart"></canvas>
+    <canvas id="rainChart"></canvas>
+    <canvas id="swellChart"></canvas>
+    <canvas id="tideChart"></canvas>
+  </section>
+
+  <section id="cams">
+    <div class="cam-buttons">
+      <button id="camBtn2">Cam 1</button>
+      <button id="camBtn3">Cam 2</button>
     </div>
+    <iframe id="camFrame" src="" frameborder="0" allowfullscreen></iframe>
+  </section>
 
-    <div class="card">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <div>
-          <h2 style="margin:0">Whangamata — Summary</h2>
-          <div id="sunset" class="footer">Sunset: --</div>
-        </div>
-        <div style="text-align:right">
-          <div class="meta"><div class="big" id="avgWind">--</div><div class="footer">avg wind</div></div>
-          <div class="meta"><div class="big" id="avgSwell">--</div><div class="footer">avg swell</div></div>
-        </div>
-      </div>
-      <hr>
-      <h3>Tide (today)</h3>
-      <canvas id="tideChart" height="160"></canvas>
-      <hr>
-      <h3>Wind overlay (map)</h3>
-      <div id="mapOverlay" class="map-placeholder">Wind direction: avg --°</div>
-    </div>
-  </div>
-</div>
-
-<script src="app.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
