@@ -6,7 +6,7 @@
 // CONFIG
 const LAT = -37.209;
 const LON = 175.873;
-const WORKER_URL = "https://stormglassproxy.o-mcguinness.workers.dev/"; // <-- replace with your Worker URL
+const WORKER_URL = "https://stormglassproxy.o-mcguinness.workers.dev"; // <-- replace with your Worker URL
 
 // Stormglass marine parameters
 const params = "windSpeed,windDirection,waveHeight,swellHeight,swellDirection";
