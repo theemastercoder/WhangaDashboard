@@ -4,7 +4,7 @@
 
 const LAT = -37.209;
 const LON = 175.873;
-const API_KEY = "0bf997b2-d660-11f0-a8f4-0242ac130003-0bf9988e-d660-11f0-a8f4-0242ac130003"; // replace with your Stormglass key
+const API_KEY = "a9a6cd36-d6dd-11f0-b4de-0242ac130003-a9a6cda4-d6dd-11f0-b4de-0242ac130003"; // replace with your Stormglass key
 
 // cams
 const CAMS = [
