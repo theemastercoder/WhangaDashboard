@@ -1,1 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Whangamata Surf Dashboard</title>
+<link rel="stylesheet" href="styles.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <h1>Whangamata Surf Dashboard — Light Mode</h1>
+  <div class="grid">
+    <div class="left">
+      <!-- CAM Card -->
+      <div class="card" id="camCard">
+        <div class="cam-switch">
+          <button id="camBtn2" class="active">Cam 2</button>
+          <button id="camBtn3">Cam 3</button>
+          <button id="camBtn4">Cam 4</button>
+        </div>
+        <iframe id="camFrame" class="cam" src="https://corolive.nz/whangamata" frameborder="0" allowfullscreen></iframe>
+        <div class="footer">Click cams to switch</div>
+      </div>
+
+      <!-- UV Chart -->
+      <div class="card">
+        <h2>UV index (today)</h2>
+        <canvas id="uvChart" height="120"></canvas>
+      </div>
+
+      <!-- Row of other charts -->
+      <div class="row">
+        <div class="card">
+          <h3>Wind (hourly)</h3>
+          <canvas id="windChart" height="140"></canvas>
+        </div>
+        <div class="card">
+          <h3>Rain (hourly)</h3>
+          <canvas id="rainChart" height="140"></canvas>
+        </div>
+        <div class="card">
+          <h3>Swell height</h3>
+          <canvas id="swellChart" height="140"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <h2 style="margin:0">Whangamata — Summary</h2>
+          <div id="sunset" class="footer">Sunset: --</div>
+        </div>
+        <div style="text-align:right">
+          <div class="meta"><div class="big" id="avgWind">--</div><div class="footer">avg wind</div></div>
+          <div class="meta"><div class="big" id="avgSwell">--</div><div class="footer">avg swell</div></div>
+        </div>
+      </div>
+      <hr>
+      <h3>Tide (today)</h3>
+      <canvas id="tideChart" height="160"></canvas>
+      <hr>
+      <h3>Wind overlay (map)</h3>
+      <div id="mapOverlay" class="map-placeholder">Map + wind overlay will show here</div>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
 
