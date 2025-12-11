@@ -37,14 +37,14 @@ setInterval(() => {
 
 // ---------------------------
 // Charts
-const uvChart    = new Chart(el('uvChart').getContext('2d'),    { type:'line', data:{labels:[], datasets:[{label:'UV index', data:[], fill:true}] } });
+
 const windChart  = new Chart(el('windChart').getContext('2d'),  { type:'line', data:{labels:[], datasets:[{label:'Wind speed (m/s)', data:[], fill:true}] } });
 const rainChart  = new Chart(el('rainChart').getContext('2d'),  { type:'line', data:{labels:[], datasets:[{label:'Precipitation (mm)', data:[], fill:true}] } });
 const swellChart = new Chart(el('swellChart').getContext('2d'), { type:'line', data:{labels:[], datasets:[{label:'Wave height (m)', data:[], fill:true}] } });
 
 // ---------------------------
 // Fetch Stormglass weather (simplified working pattern)
-const params = 'windSpeed,windDirection,waveHeight,swellHeight,swellDirection,precipitation,uvIndex';
+const params = 'windSpeed,windDirection,waveHeight,swellHeight,swellDirection,precipitation';
 
 fetch(`https://api.stormglass.io/v2/weather/point?lat=${LAT}&lng=${LON}&params=${params}`, {
   headers: { 'Authorization': API_KEY }
@@ -56,10 +56,7 @@ fetch(`https://api.stormglass.io/v2/weather/point?lat=${LAT}&lng=${LON}&params=$
   const times = data.hours.map(h => new Date(h.time).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}));
   const get = (h, v) => (h[v] && h[v].sg != null) ? h[v].sg : null;
 
-  // UV
-  uvChart.data.labels = times;
-  uvChart.data.datasets[0].data = data.hours.map(h => get(h, 'uvIndex'));
-  uvChart.update();
+
 
   // Wind
   windChart.data.labels = times;
