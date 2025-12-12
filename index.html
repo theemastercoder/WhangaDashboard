@@ -29,22 +29,25 @@
 </header>
 
 <div class="top-bar">
-  <div id="dateTime">--</div>
-  <button id="nextDayBtn">Next Day</button>
+  <div id="dateDisplay">--</div>
+  <div>
+    <button id="prevDayBtn">Previous Day</button>
+    <button id="nextDayBtn">Next Day</button>
+  </div>
 </div>
 
 <div class="summary">
   <div><h3>Avg Wind</h3><p id="avgWind">--</p></div>
   <div><h3>Total Rain</h3><p id="totalRain">--</p></div>
   <div><h3>Avg UV Index</h3><p id="avgUV">--</p></div>
-  <div><h3>Avg Wave Height</h3><p id="avgWave">--</p></div>
+  <div><h3>Total Wave Height</h3><p id="avgWave">--</p></div>
 </div>
 
 <div class="container">
   <div class="chart-card"><h3>Wind Speed (m/s)</h3><canvas id="windChart"></canvas></div>
   <div class="chart-card"><h3>Precipitation (mm)</h3><canvas id="rainChart"></canvas></div>
   <div class="chart-card"><h3>UV Index</h3><canvas id="uvChart"></canvas></div>
-  <div class="chart-card"><h3>Wave Height (m)</h3><canvas id="waveChart"></canvas></div>
+  <div class="chart-card"><h3>Wave Height (Swell vs Wind Waves)</h3><canvas id="waveChart"></canvas></div>
 
   <div class="cam-card">
     <h3>Live Cameras</h3>
