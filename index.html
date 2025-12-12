@@ -10,8 +10,8 @@
   header h1 { margin:0; font-size:2em; }
   .top-bar { display:flex; justify-content: space-between; align-items:center; padding:10px 20px; background:#3b82f6; color:white; }
   .top-bar button { padding:5px 10px; border:none; border-radius:5px; background:#1e3a8a; color:white; cursor:pointer; }
-  .summary { display:flex; justify-content:space-around; padding:20px; background:#3b82f6; color:white; }
-  .summary div { text-align:center; }
+  .summary { display:flex; justify-content:space-around; padding:20px; background:#3b82f6; color:white; flex-wrap:wrap; }
+  .summary div { text-align:center; margin:10px; }
   .container { display:flex; flex-wrap:wrap; justify-content:space-around; padding:20px; }
   .chart-card, .cam-card { background:white; border-radius:12px; box-shadow:0 2px 6px rgba(0,0,0,0.1); padding:20px; margin:10px; flex:1 1 400px; }
   .chart-card h3, .cam-card h3 { margin-top:0; margin-bottom:15px; color:#1e3a8a; }
@@ -53,13 +53,13 @@
     <h3>Live Cameras</h3>
     <iframe id="camFrame" src=""></iframe>
     <div class="cam-buttons">
-      <button id="camBtn2">Cam 1</button>
-      <button id="camBtn3">Cam 2</button>
+      <button id="camBtn0">Cam 1</button>
+      <button id="camBtn1">Cam 2</button>
     </div>
   </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="app.js"></script>
+<script src="dashboard.js"></script>
 </body>
 </html>
