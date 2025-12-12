@@ -6,9 +6,22 @@ document.addEventListener('DOMContentLoaded', () => {
   const SURF_LON    = 175.882323;
 
   const CAMS = [
-    'https://corolive.nz/whangamata',
-    'https://embed.cdn-surfline.com/cams/62ba531abf8f1d75931c9d4f/822692fdfc5bd06fb24529c6e5dc203282e425c4'
-  ];
+  {
+    name: "CoroLive",
+    src: "https://corolive.nz/whangamata",
+    class: "cam-corolive"
+  },
+  {
+    name: "Surfline",
+    src: "https://embed.cdn-surfline.com/cams/62ba531abf8f1d75931c9d4f/822692fdfc5bd06fb24529c6e5dc203282e425c4",
+    class: "cam-surfline"
+  },
+  {
+    name: "Select Solutions",
+    src: "https://webcams.selectsolutions.co.nz/cddd3df5-ea07-47ac-9eec-39e3f01ca740.html",
+    class: "cam-selectsolutions"
+  }
+];
 
   let currentCam = 0;
   let currentDate = new Date();
@@ -23,13 +36,19 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   function setCam(i){
-    currentCam = i;
-    CAMS.forEach((_, j) => {
-      const btn = el('camBtn' + j);
-      if(btn) btn.classList.toggle('active', i === j);
-    });
-    el('camFrame').src = CAMS[i] + '?t=' + Date.now();
-  }
+  currentCam = i;
+
+  const wrapper = document.getElementById("camWrapper");
+  wrapper.className = "cam-wrapper " + (CAMS[i].class || "cam-default");
+
+  CAMS.forEach((_, j) => {
+    const btn = el('camBtn' + (j + 2));
+    if (btn) btn.classList.toggle('active', i === j);
+  });
+
+  el('camFrame').src = CAMS[i].src;
+}
+
 
   setCam(0);
   setInterval(() => { el('camFrame').src = CAMS[currentCam] + '?t=' + Date.now(); }, 60000);
