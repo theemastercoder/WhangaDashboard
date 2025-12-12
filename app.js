@@ -8,7 +8,7 @@ const CAMS = [
   'https://embed.cdn-surfline.com/cams/62ba531abf8f1d75931c9d4f/822692fdfc5bd06fb24529c6e5dc203282e425c4'
 ];
 let currentCam = 0;
-let currentDate = new Date(); // selected day
+let currentDate = new Date();
 
 function el(id){return document.getElementById(id);}
 
@@ -31,70 +31,41 @@ setInterval(()=>{ el('camFrame').src=el('camFrame').src.split('?')[0]+'?t='+Date
 
 // ---------------------------
 // Charts
-function createChart(ctx,label,bgColor,borderColor){
+function createChart(ctx,label,bgColor,borderColor,stacked=false){
   return new Chart(ctx,{
     type:'line',
     data:{labels:[], datasets:[{label:label,data:[],fill:true,backgroundColor:bgColor,borderColor:borderColor,pointRadius:0}]},
     options:{
       responsive:true,
-      plugins:{
-        legend:{display:false},
-        annotation:{annotations:{}}
-      },
-      scales:{x:{display:true},y:{beginAtZero:true}}
-    },
-    plugins:[ChartAnnotation]
+      plugins:{legend:{display:true}},
+      scales:{x:{display:true},y:{beginAtZero:true, stacked:stacked}}
+    }
   });
 }
 
-// Load Chart.js annotation plugin
-const ChartAnnotation = {
-  id: 'annotation',
-  afterDraw(chart){
-    if(!chart.options.plugins.annotation || !chart.options.plugins.annotation.annotations) return;
-    Object.values(chart.options.plugins.annotation.annotations).forEach(a=>{
-      if(a.type==='line' && a.x!==undefined){
-        const ctx = chart.ctx;
-        const xScale = chart.scales.x;
-        const yScale = chart.scales.y;
-        const xPos = xScale.getPixelForValue(a.x);
-        ctx.save();
-        ctx.beginPath();
-        ctx.moveTo(xPos,yScale.top);
-        ctx.lineTo(xPos,yScale.bottom);
-        ctx.lineWidth = a.borderWidth||2;
-        ctx.strokeStyle = a.borderColor||'red';
-        ctx.stroke();
-        ctx.restore();
-      }
-    });
-  }
-};
-
-const windChart = createChart(el('windChart').getContext('2d'),'Wind Speed (m/s)','rgba(59,130,246,0.2)','#3b82f6');
-const rainChart = createChart(el('rainChart').getContext('2d'),'Precipitation (mm)','rgba(16,185,129,0.2)','#10b981');
+const windChart = createChart(el('windChart').getContext('2d'),'Wind Speed','rgba(59,130,246,0.2)','#3b82f6');
+const rainChart = createChart(el('rainChart').getContext('2d'),'Precipitation','rgba(16,185,129,0.2)','#10b981');
 const uvChart   = createChart(el('uvChart').getContext('2d'),'UV Index','rgba(245,158,11,0.2)','#f59e0b');
-const waveChart = createChart(el('waveChart').getContext('2d'),'Wave Height (m)','rgba(239,68,68,0.2)','#ef4444');
+
+// Wave chart with two datasets: Swell (bottom) + Wind Waves (top)
+const waveChart = new Chart(el('waveChart').getContext('2d'),{
+  type:'bar',
+  data:{labels:[], datasets:[
+    {label:'Swell', data:[], backgroundColor:'rgba(239,68,68,0.5)'},
+    {label:'Wind Waves', data:[], backgroundColor:'rgba(239,68,68,1)'}
+  ]},
+  options:{
+    responsive:true,
+    plugins:{legend:{display:true}},
+    scales:{x:{stacked:true}, y:{stacked:true, beginAtZero:true}}
+  }
+});
 
 // ---------------------------
-// Date display
-function updateDateTime(){
-  const today = new Date();
-  const dateStr = currentDate.toLocaleDateString(undefined,{weekday:'long',year:'numeric',month:'short',day:'numeric'});
-  const timeStr = today.toLocaleTimeString();
-  el('dateTime').innerText = `Selected Day: ${dateStr} | Current Time: ${timeStr}`;
-}
-setInterval(updateDateTime,1000);
-updateDateTime();
-
-// ---------------------------
-// Add vertical line for current hour
-function updateCurrentLine(chart){
-  const now = new Date();
-  const isToday = currentDate.toDateString()===now.toDateString();
-  if(!isToday){chart.options.plugins.annotation.annotations={}; return;}
-  const hour = now.getHours();
-  chart.options.plugins.annotation.annotations.currentHour = {type:'line', x:hour, borderColor:'red', borderWidth:2};
+// Update date display
+function updateDateDisplay(){
+  const options={weekday:'long', year:'numeric', month:'short', day:'numeric'};
+  el('dateDisplay').innerText = currentDate.toLocaleDateString(undefined,options);
 }
 
 // ---------------------------
@@ -105,19 +76,19 @@ async function fetchWeather(){
   const res = await fetch(url);
   if(!res.ok){console.error('Weather fetch failed',res.status); return;}
   const data = await res.json();
-  const times = data.hourly.time.map(t=>new Date(t).getHours());
+  const hours = data.hourly.time.map(t=>new Date(t).getHours()+':00');
 
-  windChart.data.labels = times;
+  windChart.data.labels = hours;
   windChart.data.datasets[0].data = data.hourly.wind_speed_10m;
-  updateCurrentLine(windChart); windChart.update();
+  windChart.update();
 
-  rainChart.data.labels = times;
+  rainChart.data.labels = hours;
   rainChart.data.datasets[0].data = data.hourly.precipitation;
-  updateCurrentLine(rainChart); rainChart.update();
+  rainChart.update();
 
-  uvChart.data.labels = times;
+  uvChart.data.labels = hours;
   uvChart.data.datasets[0].data = data.hourly.uv_index;
-  updateCurrentLine(uvChart); uvChart.update();
+  uvChart.update();
 
   // Summary
   const windAvg = data.hourly.wind_speed_10m.reduce((a,b)=>a+b,0)/data.hourly.wind_speed_10m.length;
@@ -129,47 +100,42 @@ async function fetchWeather(){
 }
 
 // ---------------------------
-// Fetch waves (marine API)
+// Fetch waves (marine API with Swell + Wind Waves)
 async function fetchWaves(){
   const dateStr = currentDate.toISOString().split('T')[0];
-  const url = `https://marine-api.open-meteo.com/v1/marine?latitude=${SURF_LAT}&longitude=${SURF_LON}&hourly=wave_height&timezone=auto&start_date=${dateStr}&end_date=${dateStr}`;
+  const url = `https://marine-api.open-meteo.com/v1/marine?latitude=${SURF_LAT}&longitude=${SURF_LON}&hourly=wave_height,swell_height&timezone=auto&start_date=${dateStr}&end_date=${dateStr}`;
   const res = await fetch(url);
   if(!res.ok){console.error('Wave fetch failed',res.status); return;}
   const data = await res.json();
-  const times = data.hourly.time.map(t=>new Date(t).getHours());
+  const hours = data.hourly.time.map(t=>new Date(t).getHours()+':00');
 
-  waveChart.data.labels = times;
-  waveChart.data.datasets[0].data = data.hourly.wave_height;
-  updateCurrentLine(waveChart); waveChart.update();
+  waveChart.data.labels = hours;
+  waveChart.data.datasets[0].data = data.hourly.swell_height;   // bottom layer
+  waveChart.data.datasets[1].data = data.hourly.wave_height.map((v,i)=>v - data.hourly.swell_height[i]); // top layer
+  waveChart.update();
 
-  const avgWave = data.hourly.wave_height.reduce((a,b)=>a+b,0)/data.hourly.wave_height.length;
-  el('avgWave').innerText = avgWave.toFixed(1)+' m';
+  const totalWaveAvg = data.hourly.wave_height.reduce((a,b)=>a+b,0)/data.hourly.wave_height.length;
+  el('avgWave').innerText = totalWaveAvg.toFixed(1)+' m';
 }
 
 // ---------------------------
-// Previous / Next Day Buttons
-const nextBtn = el('nextDayBtn');
-const prevBtn = document.createElement('button');
-prevBtn.innerText='Previous Day';
-prevBtn.style.marginRight='10px';
-nextBtn.parentNode.insertBefore(prevBtn,nextBtn);
-
-function loadDay(){
-  fetchWeather();
-  fetchWaves();
-  updateDateTime();
-}
-
-prevBtn.addEventListener('click',()=>{
+// Previous / Next day
+el('prevDayBtn').addEventListener('click',()=>{
   currentDate.setDate(currentDate.getDate()-1);
   loadDay();
 });
-nextBtn.addEventListener('click',()=>{
+el('nextDayBtn').addEventListener('click',()=>{
   currentDate.setDate(currentDate.getDate()+1);
   loadDay();
 });
 
+function loadDay(){
+  updateDateDisplay();
+  fetchWeather();
+  fetchWaves();
+}
+
 // ---------------------------
-// Init
+// Initialize
 loadDay();
 setInterval(()=>{fetchWeather(); fetchWaves();},30*60*1000);
