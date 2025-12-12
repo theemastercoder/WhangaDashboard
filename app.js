@@ -1,27 +1,16 @@
 document.addEventListener('DOMContentLoaded', () => {
 
+  const SURF_LAT = -37.208123;
+  const SURF_LON = 175.882323;
   const WEATHER_LAT = -37.216906;
   const WEATHER_LON = 175.87488;
   const SURF_LAT    = -37.208123;
   const SURF_LON    = 175.882323;
 
   const CAMS = [
-  {
-    name: "CoroLive",
-    src: "https://corolive.nz/whangamata",
-    class: "cam-corolive"
-  },
-  {
-    name: "Surfline",
-    src: "https://embed.cdn-surfline.com/cams/62ba531abf8f1d75931c9d4f/822692fdfc5bd06fb24529c6e5dc203282e425c4",
-    class: "cam-surfline"
-  },
-  {
-    name: "Select Solutions",
-    src: "https://webcams.selectsolutions.co.nz/cddd3df5-ea07-47ac-9eec-39e3f01ca740.html",
-    class: "cam-selectsolutions"
-  }
-];
+    'https://corolive.nz/whangamata',
+    'https://embed.cdn-surfline.com/cams/62ba531abf8f1d75931c9d4f/822692fdfc5bd06fb24529c6e5dc203282e425c4'
+  ];
 
   let currentCam = 0;
   let currentDate = new Date();
@@ -30,30 +19,44 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ---------------------------
   // Cameras
+  CAMS.forEach((url,i)=>{
+    const btn = el('camBtn'+i);
+    if(btn) btn.addEventListener('click',()=>setCam(i));
   CAMS.forEach((url, i) => {
     const btn = el('camBtn' + i);
     if (btn) btn.addEventListener('click', () => setCam(i));
   });
 
   function setCam(i){
-  currentCam = i;
-
-  const wrapper = document.getElementById("camWrapper");
-  wrapper.className = "cam-wrapper " + (CAMS[i].class || "cam-default");
-
-  CAMS.forEach((_, j) => {
-    const btn = el('camBtn' + (j + 2));
-    if (btn) btn.classList.toggle('active', i === j);
-  });
-
-  el('camFrame').src = CAMS[i].src;
-}
-
+    currentCam = i;
+    CAMS.forEach((_,j)=>{
+      const btn = el('camBtn'+j);
+      if(btn) btn.classList.toggle('active', i===j);
+    CAMS.forEach((_, j) => {
+      const btn = el('camBtn' + j);
+      if(btn) btn.classList.toggle('active', i === j);
+    });
+    el('camFrame').src = CAMS[i] + '?t=' + Date.now();
+  }
 
   setCam(0);
+  setInterval(()=>{ el('camFrame').src = CAMS[currentCam] + '?t=' + Date.now(); }, 60000);
   setInterval(() => { el('camFrame').src = CAMS[currentCam] + '?t=' + Date.now(); }, 60000);
 
   // ---------------------------
+  // Wave Chart
+  const waveChart = new Chart(el('waveChart').getContext('2d'),{
+    type:'bar',
+    data:{labels:[], datasets:[
+      {label:'Swell', data:[], backgroundColor:'rgba(239,68,68,0.5)'},
+      {label:'Wind Waves', data:[], backgroundColor:'rgba(239,68,68,1)'}
+    ]},
+    options:{
+      responsive:true,
+      plugins:{legend:{display:true}},
+      scales:{x:{stacked:true}, y:{stacked:true, beginAtZero:true}}
+    }
+  });
   // Charts
   function createChart(ctx, label, bgColor, borderColor){
     return new Chart(ctx, {
@@ -74,6 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const waveChart = createChart(el('waveChart').getContext('2d'),'Total Wave Height','rgba(239,68,68,0.5)','#ef4444');
 
   // ---------------------------
+  // Date display
   // Update date
   function updateDateDisplay(){
     const options={weekday:'long', year:'numeric', month:'short', day:'numeric'};
@@ -81,6 +85,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ---------------------------
+  // Fetch Waves
   // Fetch weather
   async function fetchWeather(){
     try {
@@ -125,31 +130,41 @@ document.addEventListener('DOMContentLoaded', () => {
       if(currentDate > today){
         el('avgWave').innerText = '--';
         waveChart.data.labels = [];
+        waveChart.data.datasets.forEach(ds => ds.data = []);
         waveChart.data.datasets[0].data = [];
         waveChart.update();
         return;
       }
 
       const dateStr = currentDate.toISOString().split('T')[0];
+      const url = `https://marine-api.open-meteo.com/v1/marine?latitude=${SURF_LAT}&longitude=${SURF_LON}&hourly=wave_height,swell_height&timezone=auto&start_date=${dateStr}&end_date=${dateStr}`;
       const url = `https://marine-api.open-meteo.com/v1/marine?latitude=${SURF_LAT}&longitude=${SURF_LON}&hourly=wave_height&timezone=auto&start_date=${dateStr}&end_date=${dateStr}`;
       const res = await fetch(url);
       if(!res.ok) throw new Error(res.status);
       const data = await res.json();
       if(!data.hourly || !data.hourly.time) return;
 
+      const hours = data.hourly.time.map(t => new Date(t).getHours()+':00');
+      const swell = data.hourly.swell_height.map(v => v ?? 0).slice(0,hours.length);
+      const windWaves = data.hourly.wave_height.map((v,i)=>Math.max(0,(v??0)-swell[i])).slice(0,hours.length);
       const hours = data.hourly.time.map(t=>new Date(t).getHours()+':00');
       const waveData = data.hourly.wave_height.map(v => v ?? 0).slice(0,hours.length);
 
       waveChart.data.labels = hours;
+      waveChart.data.datasets[0].data = swell;
+      waveChart.data.datasets[1].data = windWaves;
       waveChart.data.datasets[0].data = waveData;
       waveChart.update();
 
+      const totalWaveAvg = data.hourly.wave_height.reduce((a,b)=>a+(b??0),0)/data.hourly.wave_height.length;
+      el('avgWave').innerText = totalWaveAvg.toFixed(1)+' m';
       el('avgWave').innerText = (waveData.reduce((a,b)=>a+b,0)/waveData.length).toFixed(1)+' m';
 
     } catch(err){
       console.error('Wave fetch failed', err);
       el('avgWave').innerText = '--';
       waveChart.data.labels = [];
+      waveChart.data.datasets.forEach(ds => ds.data = []);
       waveChart.data.datasets[0].data = [];
       waveChart.update();
     }
@@ -181,6 +196,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // ---------------------------
   // Initialize
   loadDay();
+  setInterval(fetchWaves,30*60*1000);
   setInterval(()=>{ fetchWeather(); fetchWaves(); },30*60*1000);
 
 });
