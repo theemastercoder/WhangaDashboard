@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Whangamatā Surf & Weather Dashboard</title>
+<title>Whangamatā Surf Dashboard</title>
 <style>
   body { font-family: Arial,sans-serif; margin:0; background:#f0f4f8; color:#333; }
   header { background:#1e3a8a; color:white; padding:20px; text-align:center; }
@@ -25,7 +25,7 @@
 <body>
 
 <header>
-  <h1>Whangamatā Surf & Weather Dashboard</h1>
+  <h1>Whangamatā Surf Dashboard</h1>
 </header>
 
 <div class="top-bar">
@@ -37,16 +37,10 @@
 </div>
 
 <div class="summary">
-  <div><h3>Avg Wind</h3><p id="avgWind">--</p></div>
-  <div><h3>Total Rain</h3><p id="totalRain">--</p></div>
-  <div><h3>Avg UV Index</h3><p id="avgUV">--</p></div>
   <div><h3>Total Wave Height</h3><p id="avgWave">--</p></div>
 </div>
 
 <div class="container">
-  <div class="chart-card"><h3>Wind Speed (m/s)</h3><canvas id="windChart"></canvas></div>
-  <div class="chart-card"><h3>Precipitation (mm)</h3><canvas id="rainChart"></canvas></div>
-  <div class="chart-card"><h3>UV Index</h3><canvas id="uvChart"></canvas></div>
   <div class="chart-card"><h3>Wave Height (Swell vs Wind Waves)</h3><canvas id="waveChart"></canvas></div>
 
   <div class="cam-card">
