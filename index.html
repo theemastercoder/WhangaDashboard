@@ -5,11 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Whangamatā Surf & Weather Dashboard</title>
 <style>
-  body { font-family: Arial, sans-serif; margin:0; background:#f0f4f8; color:#333; }
+
+  body { font-family: Arial,sans-serif; margin:0; background:#f0f4f8; color:#333; }
   header { background:#1e3a8a; color:white; padding:20px; text-align:center; }
   header h1 { margin:0; font-size:2em; }
-  .top-bar { display:flex; justify-content: space-between; align-items:center; padding:10px 20px; background:#3b82f6; color:white; flex-wrap:wrap; }
-  .top-bar button { padding:5px 10px; border:none; border-radius:5px; background:#1e3a8a; color:white; cursor:pointer; margin:2px; }
+  .top-bar { display:flex; justify-content: space-between; align-items:center; padding:10px 20px; background:#3b82f6; color:white; }
+  .top-bar button { padding:5px 10px; border:none; border-radius:5px; background:#1e3a8a; color:white; cursor:pointer; }
   .summary { display:flex; justify-content:space-around; padding:20px; background:#3b82f6; color:white; flex-wrap:wrap; }
   .summary div { text-align:center; margin:10px; }
   .container { display:flex; flex-wrap:wrap; justify-content:space-around; padding:20px; }
@@ -17,19 +18,66 @@
   .chart-card h3, .cam-card h3 { margin-top:0; margin-bottom:15px; color:#1e3a8a; }
   canvas { max-width:100%; }
 
-  /* Camera styling */
+iframe {
+  scrolling: no;
+}
+
   .cam-wrapper {
-    width: 100%;
-    height: 300px;
-    overflow: hidden;
-    position: relative;
-  }
-  .cam-frame {
-    width: 100%;
-    height: 100%;
-    border: none;
-    display: block;
-  }
+  width: 100%;
+  height: 300px;
+  overflow: hidden;
+     
+  position: relative;
+  border-radius: 8px;
+}
+
+.cam-frame {
+  position: absolute;
+  border: none;
+  width: 1000px;    
+  height: 600px;
+  transform-origin: top left;
+  transform: scale(0.8); 
+}
+
+/* ---------- DEFAULT: 80% SCALE ---------- */
+.cam-default .cam-frame {
+  width: 125%;
+  height: 125%;
+  transform: scale(0.8);
+  transform-origin: top left;
+}
+
+/* ---------- SELECT SOLUTIONS: NO CROP ---------- */
+.cam-selectsolutions {
+  height: 300px;
+}
+.cam-selectsolutions .cam-frame {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform: none;
+}
+
+/* ---------- SURFLINE: NO CROP ---------- */
+.cam-surfline .cam-frame {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform: none;
+}
+
+/* ---------- COROLIVE: PRECISE CROP ---------- */
+.cam-corolive {
+  height: calc(883px - 190px); /* 693px */
+}
+
+.cam-corolive .cam-frame {
+  width: 1565px;
+  height: 883px;
+  left: -334px;
+  top: -190px;
+}
 
   .cam-buttons { text-align:center; margin:10px 0; }
   .cam-buttons button { margin:0 5px; padding:5px 10px; border-radius:6px; border:none; cursor:pointer; background:#3b82f6; color:white; font-weight:bold; }
@@ -67,149 +115,18 @@
   <div class="cam-card">
     <h3>Live Cameras</h3>
     <div id="camWrapper" class="cam-wrapper">
-      <iframe id="camFrame" class="cam-frame" src=""></iframe>
+  <iframe id="camFrame"  scrolling="no" class="cam-frame" src=""></iframe>
+</div>
+
+    <div class="cam-buttons">
+      <button id="camBtn0">Cam 1</button>
+      <button id="camBtn1">Cam 2</button>
+      <button id="camBtn2">Cam 3</button>
     </div>
-    <div class="cam-buttons" id="camButtons"></div>
-    <button id="fullscreenBtn">Fullscreen</button>
   </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-const WEATHER_LAT = -37.216906;
-const WEATHER_LON = 175.87488;
-const SURF_LAT = -37.208123;
-const SURF_LON = 175.882323;
-
-let currentDate = new Date();
-
-// ---------------------------
-// Cameras
-const CAMS = [
-  { name: "CoroLive", src: "https://corolive.nz/whangamata" },
-  { name: "Surfline", src: "https://embed.cdn-surfline.com/cams/62ba531abf8f1d75931c9d4f/822692fdfc5bd06fb24529c6e5dc203282e425c4" },
-  { name: "Select Solutions", src: "https://webcams.selectsolutions.co.nz/cddd3df5-ea07-47ac-9eec-39e3f01ca740.html" }
-];
-
-const camButtons = document.getElementById("camButtons");
-
-CAMS.forEach((cam, i) => {
-  const btn = document.createElement("button");
-  btn.textContent = cam.name;
-  btn.addEventListener("click", () => setCam(i));
-  camButtons.appendChild(btn);
-});
-
-function setCam(i){
-  document.getElementById("camFrame").src = CAMS[i].src;
-  [...camButtons.children].forEach((b,j)=>b.classList.toggle("active", j===i));
-}
-setCam(0);
-
-// Fullscreen button
-document.getElementById("fullscreenBtn").addEventListener("click",()=>{
-  const frame = document.getElementById("camFrame");
-  if(frame.requestFullscreen) frame.requestFullscreen();
-});
-
-// ---------------------------
-// Charts
-function el(id){return document.getElementById(id);}
-function createChart(ctx,label,bgColor,borderColor){
-  return new Chart(ctx,{
-    type:'line',
-    data:{labels:[], datasets:[{label:label,data:[],fill:true,backgroundColor:bgColor,borderColor:borderColor,pointRadius:0}]},
-    options:{responsive:true, plugins:{legend:{display:true}}, scales:{x:{display:true},y:{beginAtZero:true}}}
-  });
-}
-
-const windChart = createChart(el('windChart').getContext('2d'),'Wind Speed','rgba(59,130,246,0.2)','#3b82f6');
-const rainChart = createChart(el('rainChart').getContext('2d'),'Precipitation','rgba(16,185,129,0.2)','#10b981');
-const uvChart   = createChart(el('uvChart').getContext('2d'),'UV Index','rgba(245,158,11,0.2)','#f59e0b');
-const waveChart = new Chart(el('waveChart').getContext('2d'),{
-  type:'line',
-  data:{labels:[], datasets:[{label:'Wave Height', data:[], fill:true, backgroundColor:'rgba(239,68,68,0.2)', borderColor:'rgba(239,68,68,1)', pointRadius:0}]},
-  options:{responsive:true, plugins:{legend:{display:true}}, scales:{x:{display:true},y:{beginAtZero:true}}}
-});
-
-// ---------------------------
-// Update date display
-function updateDateDisplay(){
-  const options={weekday:'long', year:'numeric', month:'short', day:'numeric'};
-  el('dateDisplay').innerText = currentDate.toLocaleDateString(undefined,options);
-}
-
-// ---------------------------
-// Fetch weather
-async function fetchWeather(){
-  const dateStr = currentDate.toISOString().split('T')[0];
-  const url = `https://api.open-meteo.com/v1/forecast?latitude=${WEATHER_LAT}&longitude=${WEATHER_LON}&hourly=wind_speed_10m,precipitation,uv_index&timezone=auto&forecast_days=7`;
-  const res = await fetch(url);
-  if(!res.ok){console.error('Weather fetch failed',res.status); return;}
-  const data = await res.json();
-  
-  const indices = data.hourly.time.map((t,i)=>t.startsWith(dateStr)?i:-1).filter(i=>i!==-1);
-
-  windChart.data.labels = indices.map(i=>new Date(data.hourly.time[i]).getHours()+':00');
-  windChart.data.datasets[0].data = indices.map(i=>data.hourly.wind_speed_10m[i]);
-  windChart.update();
-
-  rainChart.data.labels = indices.map(i=>new Date(data.hourly.time[i]).getHours()+':00');
-  rainChart.data.datasets[0].data = indices.map(i=>data.hourly.precipitation[i]);
-  rainChart.update();
-
-  uvChart.data.labels = indices.map(i=>new Date(data.hourly.time[i]).getHours()+':00');
-  uvChart.data.datasets[0].data = indices.map(i=>data.hourly.uv_index[i]);
-  uvChart.update();
-
-  const windAvg = indices.reduce((a,b)=>a+data.hourly.wind_speed_10m[b],0)/indices.length;
-  const rainTotal = indices.reduce((a,b)=>a+data.hourly.precipitation[b],0);
-  const uvAvg = indices.reduce((a,b)=>a+data.hourly.uv_index[b],0)/indices.length;
-
-  el('avgWind').innerText = windAvg.toFixed(1)+' m/s';
-  el('totalRain').innerText = rainTotal.toFixed(1)+' mm';
-  el('avgUV').innerText = uvAvg.toFixed(1);
-}
-
-// ---------------------------
-// Fetch waves
-async function fetchWaves(){
-  const dateStr = currentDate.toISOString().split('T')[0];
-  const url = `https://marine-api.open-meteo.com/v1/marine?latitude=${SURF_LAT}&longitude=${SURF_LON}&hourly=wave_height&timezone=auto&start_date=${dateStr}&end_date=${dateStr}`;
-  const res = await fetch(url);
-  if(!res.ok){console.error('Wave fetch failed',res.status); return;}
-  const data = await res.json();
-
-  const hours = data.hourly.time.map(t=>new Date(t).getHours()+':00');
-  waveChart.data.labels = hours;
-  waveChart.data.datasets[0].data = data.hourly.wave_height;
-  waveChart.update();
-
-  const totalWaveAvg = data.hourly.wave_height.reduce((a,b)=>a+b,0)/data.hourly.wave_height.length;
-  el('avgWave').innerText = totalWaveAvg.toFixed(1)+' m';
-}
-
-// ---------------------------
-// Previous / Next day
-el('prevDayBtn').addEventListener('click',()=>{
-  currentDate.setDate(currentDate.getDate()-1);
-  loadDay();
-});
-el('nextDayBtn').addEventListener('click',()=>{
-  currentDate.setDate(currentDate.getDate()+1);
-  loadDay();
-});
-
-function loadDay(){
-  updateDateDisplay();
-  fetchWeather();
-  fetchWaves();
-}
-
-// ---------------------------
-// Initialize
-loadDay();
-setInterval(()=>{fetchWeather(); fetchWaves();},30*60*1000);
-</script>
+<script src="app.js"></script>
 </body>
 </html>
