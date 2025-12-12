@@ -18,10 +18,15 @@
   .chart-card h3, .cam-card h3 { margin-top:0; margin-bottom:15px; color:#1e3a8a; }
   canvas { max-width:100%; }
   
+iframe {
+  scrolling: no;
+}
+
   .cam-wrapper {
   width: 100%;
   height: 300px;
   overflow: hidden;
+     
   position: relative;
   border-radius: 8px;
 }
@@ -106,12 +111,13 @@
   <div class="cam-card">
     <h3>Live Cameras</h3>
     <div id="camWrapper" class="cam-wrapper">
-  <iframe id="camFrame" class="cam-frame" src=""></iframe>
+  <iframe id="camFrame"  scrolling="no" class="cam-frame" src=""></iframe>
 </div>
 
     <div class="cam-buttons">
       <button id="camBtn0">Cam 1</button>
       <button id="camBtn1">Cam 2</button>
+      <button id="camBtn2">Cam 3</button>
     </div>
   </div>
 </div>
